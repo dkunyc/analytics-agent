@@ -1,0 +1,27 @@
+name: analytics_agent
+version: "0.1.0"
+profile: analytics_agent
+
+flags:
+  send_anonymous_usage_stats: false
+  use_colors: false
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+models:
+  analytics_agent:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+    pipeline:
+      +materialized: table
+      staging:
+        +materialized: view

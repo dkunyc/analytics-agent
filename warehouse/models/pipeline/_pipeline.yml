@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: stg_salesforce_opportunity
+    description: One synthetic Salesforce opportunity. account_source_id points at salesforce_account.source_id.
+  - name: stg_hubspot_deal
+    description: One synthetic HubSpot deal. company_source_id points at hubspot_company.source_id.
+  - name: pipeline_items
+    description: >
+      Salesforce opportunities and HubSpot deals side by side. This model does
+      not match people or companies across source systems.
+    columns:
+      - name: source_system
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["salesforce", "hubspot"]
+      - name: item_source_id
+        data_tests:
+          - not_null
+      - name: organization_source_id
+        data_tests:
+          - not_null
+      - name: amount
+        data_tests:
+          - not_null
+      - name: is_open
+        data_tests:
+          - not_null

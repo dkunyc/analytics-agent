@@ -1,0 +1,63 @@
+{
+  "dataset": "synthetic",
+  "calls_model": false,
+  "note": "Baseline questions for the synthetic warehouse. The check runs sql and compares it to expected. It does not score a model response.",
+  "cases": [
+    {
+      "id": "open_pipeline_amount",
+      "category": "pipeline",
+      "question": "What is the open sales pipeline amount across Salesforce opportunities and HubSpot deals?",
+      "sql": "select round(sum(amount), 2) from pipeline_items where is_open",
+      "expected": 80000
+    },
+    {
+      "id": "salesforce_open_pipeline",
+      "category": "pipeline",
+      "question": "What is the open Salesforce opportunity amount?",
+      "sql": "select round(sum(amount), 2) from pipeline_items where is_open and source_system = 'salesforce'",
+      "expected": 62000
+    },
+    {
+      "id": "hubspot_open_pipeline",
+      "category": "pipeline",
+      "question": "What is the open HubSpot deal amount?",
+      "sql": "select round(sum(amount), 2) from pipeline_items where is_open and source_system = 'hubspot'",
+      "expected": 18000
+    },
+    {
+      "id": "signups_without_contact",
+      "category": "pipeline",
+      "question": "How many sample signup events have no HubSpot contact id?",
+      "sql": "select count(*) from crm_raw.signup_event where hubspot_contact_source_id is null",
+      "expected": 1
+    },
+    {
+      "id": "total_successful_revenue",
+      "category": "revenue",
+      "question": "What is the total successful payment revenue?",
+      "sql": "select round(sum(successful_revenue), 2) from customer_orders",
+      "expected": 78.5
+    },
+    {
+      "id": "completed_orders",
+      "category": "orders",
+      "question": "How many orders have status completed?",
+      "sql": "select count(*) from fct_orders where status = 'completed'",
+      "expected": 4
+    },
+    {
+      "id": "top_customer_by_revenue",
+      "category": "customers",
+      "question": "Which customer has the highest successful payment revenue? Tie-break is the lowest customer_id.",
+      "sql": "select first_name || ' ' || last_name from customer_orders order by successful_revenue desc, customer_id asc limit 1",
+      "expected": "Avery Nguyen"
+    },
+    {
+      "id": "customers_without_orders",
+      "category": "customers",
+      "question": "How many customers have no orders?",
+      "sql": "select count(*) from customer_orders where order_count = 0",
+      "expected": 1
+    }
+  ]
+}

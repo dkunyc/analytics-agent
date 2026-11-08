@@ -1,0 +1,29 @@
+version: 2
+
+sources:
+  - name: crm
+    description: Synthetic CRM tables loaded by dlt into the crm_raw schema. Not live Salesforce or HubSpot data.
+    schema: crm_raw
+    tables:
+      - name: salesforce_account
+        description: Synthetic Salesforce accounts. source_id is the source record id.
+      - name: salesforce_contact
+        description: Synthetic Salesforce contacts. Email is not a cross-system person key.
+      - name: salesforce_lead
+        description: Synthetic unconverted Salesforce leads. They are not accounts.
+      - name: salesforce_opportunity
+        description: Synthetic Salesforce opportunities.
+      - name: salesforce_event
+        description: Synthetic Salesforce events.
+      - name: salesforce_task
+        description: Synthetic Salesforce tasks.
+      - name: hubspot_company
+        description: Synthetic HubSpot companies. A shared display name with a Salesforce account is not identity.
+      - name: hubspot_contact
+        description: Synthetic HubSpot contacts. Contact creation is not a signup.
+      - name: hubspot_deal
+        description: Synthetic HubSpot deals.
+      - name: hubspot_activity
+        description: Synthetic activity sample. The HubSpot verified source does not load this table.
+      - name: signup_event
+        description: Synthetic business sample with mapping_status undecided. Not a HubSpot standard object.

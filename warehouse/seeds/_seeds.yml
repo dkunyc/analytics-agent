@@ -1,0 +1,9 @@
+version: 2
+
+seeds:
+  - name: raw_customers
+    description: Synthetic customers written for this repo. Not upstream jaffle_shop data.
+  - name: raw_orders
+    description: Synthetic orders written for this repo. Not upstream jaffle_shop data.
+  - name: raw_payments
+    description: Synthetic payments written for this repo. Not upstream jaffle_shop data.
