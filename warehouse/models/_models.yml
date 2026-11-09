@@ -1,0 +1,73 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: One row per synthetic customer.
+    columns:
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+  - name: stg_orders
+    description: One row per synthetic order.
+    columns:
+      - name: order_id
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["completed", "returned", "placed"]
+  - name: stg_payments
+    description: One row per synthetic payment.
+    columns:
+      - name: payment_id
+        data_tests:
+          - unique
+          - not_null
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["success", "refund", "pending"]
+      - name: amount
+        data_tests:
+          - not_null
+  - name: fct_orders
+    description: Orders with successful payment revenue. Refunds and pending payments contribute 0.
+    columns:
+      - name: order_id
+        data_tests:
+          - unique
+          - not_null
+      - name: successful_revenue
+        description: Sum of payment amounts with status success.
+        data_tests:
+          - not_null
+  - name: customer_orders
+    description: Customers, including those with no orders, and their successful payment revenue.
+    columns:
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+      - name: successful_revenue
+        description: Sum of successful payment amounts on the customer's orders.
+        data_tests:
+          - not_null

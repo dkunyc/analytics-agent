@@ -1,0 +1,9 @@
+# Local file warehouse only. This profile has no credentials.
+analytics_agent:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: target/warehouse.duckdb
+      schema: main
+      threads: 1

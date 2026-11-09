@@ -1,0 +1,7 @@
+payment_id,order_id,method,amount,status
+501,101,card,16.00,success
+502,102,card,24.50,success
+503,103,gift_card,11.00,success
+504,104,card,19.00,refund
+505,105,bank_transfer,27.00,success
+506,106,card,8.00,pending

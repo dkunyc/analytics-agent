@@ -1,0 +1,6 @@
+# Direct dependencies for the offline warehouse checks. No LLM, LibreChat, or tracing packages.
+# This checkout was tested on Python 3.12. dbt-core==1.11.17 Requires-Python is >=3.10.
+dbt-core==1.11.17
+dbt-duckdb==1.11.1
+duckdb==1.5.5
+dlt[duckdb]==1.32.0

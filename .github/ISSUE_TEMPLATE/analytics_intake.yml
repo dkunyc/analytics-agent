@@ -1,0 +1,51 @@
+name: Analytics intake
+description: Propose a warehouse question. A human reviews it before it becomes an eval case.
+title: "[intake] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use a synthetic example. Do not include credentials, employer data, personal hardware details, or private chat content.
+
+        Phase 0 does not collect telemetry. A human must review this intake before it is copied into `agent/evals/baseline.json` or before a model changes.
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: The analytics question, in plain language.
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - revenue
+        - orders
+        - customers
+        - data quality
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: The result a human would accept, or how to check it against the synthetic warehouse.
+    validations:
+      required: true
+  - type: textarea
+    id: failure_notes
+    attributes:
+      label: Failure notes
+      description: Optional. If a later agent answered this badly, describe the failure so it can become an eval case after review.
+    validations:
+      required: false
+  - type: checkboxes
+    id: human_review
+    attributes:
+      label: Human review
+      description: Required. Submitting this issue is not approval to change the warehouse or the eval baseline.
+      options:
+        - label: A human has reviewed this intake and it may be considered for an eval case or a model change.
+          required: true

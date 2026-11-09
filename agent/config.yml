@@ -1,0 +1,48 @@
+# Phase 0 does not read this file and does not call a network.
+# Headless warehouse jobs and the planned LibreChat frontend are separate processes.
+# Nothing here creates a shared trace.
+
+headless_workflow:
+  status: warehouse_only
+  model_client: not_implemented
+  # A later client can call an OpenAI-compatible API. No client exists in this repo.
+  model_api: openai_compatible
+
+librechat_v1:
+  status: planned_not_deployed
+  # LibreChat's documented OpenRouter variable. Not OPENROUTER_API_KEY.
+  openrouter_key_env: OPENROUTER_KEY
+  openrouter_base_url: https://openrouter.ai/api/v1
+  code_interpreter_baseurl_env: LIBRECHAT_CODE_BASEURL
+  langfuse_public_key_env: LANGFUSE_PUBLIC_KEY
+  langfuse_secret_key_env: LANGFUSE_SECRET_KEY
+  langfuse_base_url_env: LANGFUSE_BASE_URL
+  otel_tracing_enabled_env: OTEL_TRACING_ENABLED
+  otel_endpoint_env: OTEL_EXPORTER_OTLP_ENDPOINT
+  rum_enabled_env: RUM_ENABLED
+
+execution_adapter:
+  # Planned code runs in the separate Code Interpreter service, not on the user machine.
+  kind: remote_sandbox
+  host_filesystem: not_granted
+  deployed: false
+
+browser_monitoring:
+  interpretation: pending
+  intended: frontend_errors_performance_and_request_correlation
+  session_replay: off
+  console_capture: off
+  advanced_network_capture: off
+  captures_prompts_by_default: false
+
+provider_account:
+  # Future OpenRouter account settings. Not enabled. Not verified by this repo.
+  zero_data_retention: not_configured
+  key_spend_cap: not_configured
+
+traces:
+  headless_workflow: not_instrumented
+  librechat_langfuse: not_connected
+  librechat_backend_otel: not_connected
+  librechat_browser_rum: not_connected
+  shared_end_to_end_span: false
