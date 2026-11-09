@@ -9,7 +9,9 @@ import json
 import sys
 from pathlib import Path
 
-import duckdb
+import preflight
+
+duckdb = preflight.require_import("duckdb")
 
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "warehouse" / "target" / "warehouse.duckdb"

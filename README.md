@@ -18,15 +18,37 @@ A smaller synthetic jaffle-style shop (customers, orders, payments) is still bui
 
 ## Run
 
-Verified with Python 3.12. If `python3 -m venv` reports that ensurepip is unavailable, install the distro `python3-venv` package and create the environment again. GitHub Actions uses `setup-python`, which already includes it.
+Check the interpreter before creating a virtual environment. This checkout was tested with Python 3.12.3. `dbt-core==1.11.17` publishes `Requires-Python: >=3.10` (universal wheel, not yanked). Python 3.9.6 cannot install that pin. pip then stops, so `import duckdb` fails with `ModuleNotFoundError`.
+
+On macOS, `python3` is often 3.9.6 from the system or the Xcode command-line tools. A venv made from it carries that version and an old pip (21.2.4 in the reported `.venv/lib/python3.9` environment). Upgrading pip inside that 3.9 environment does not make the pin installable. Leave `.venv` where it is.
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+python3.12 --version
+```
+
+Continue only when that command prints Python 3.12.x. If `python3.12` is not found, install Python 3.12 from python.org or Homebrew (`brew install python@3.12`) and check the version again. Do not remove an existing `.venv`. If `.venv312` is already present, pick another new directory name instead of replacing it.
+
+```bash
+python3.12 -m venv .venv312
+source .venv312/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python scripts/preflight.py
 python scripts/smoke.py
 python scripts/eval_check.py
 ```
+
+`python scripts/preflight.py` exits before the warehouse checks when the interpreter is not 3.12. If a setup still fails, these commands show which interpreter and pip were used:
+
+```bash
+python3 --version
+python3 -c 'import sys; print(sys.executable)'
+.venv/bin/python3 --version
+.venv/bin/python3 -m pip --version
+python3.12 --version
+```
+
+GitHub Actions uses `setup-python` with Python 3.12. On Debian or Ubuntu, `python3 -m venv` can report that ensurepip is unavailable until the distro `python3-venv` package is installed.
 
 `python -m ingestion.load` is the ingestion step alone. `scripts/smoke.py` deletes generated state, runs that load, then `dbt seed` and `dbt build`, and checks both amounts.
 
