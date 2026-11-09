@@ -7,7 +7,7 @@ body:
       value: |
         Use a synthetic example. Do not include credentials, employer data, personal hardware details, or private chat content.
 
-        Phase 0 does not collect telemetry. A human must review this intake before it is copied into `agent/evals/baseline.json` or before a model changes.
+        The ask command writes a local trace and can post it to Langfuse when keys are set. A human must review this intake before it is copied into an eval fixture or before a model changes.
   - type: textarea
     id: question
     attributes:

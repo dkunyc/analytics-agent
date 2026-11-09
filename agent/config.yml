@@ -1,12 +1,24 @@
-# Phase 0 does not read this file and does not call a network.
-# Headless warehouse jobs and the planned LibreChat frontend are separate processes.
-# Nothing here creates a shared trace.
+# The headless ask command reads headless_workflow.
+# LibreChat is a separate process and is not started here.
+# This file does not create a shared trace with LibreChat.
 
 headless_workflow:
-  status: warehouse_only
-  model_client: not_implemented
-  # A later client can call an OpenAI-compatible API. No client exists in this repo.
+  status: ask
+  model_client: openrouter_or_offline
+  # OpenAI-compatible chat completions. The client does not call LibreChat.
   model_api: openai_compatible
+  openrouter_base_url: https://openrouter.ai/api/v1
+  openrouter_key_env: OPENROUTER_KEY
+  openrouter_model_env: OPENROUTER_MODEL
+  # Used when OPENROUTER_MODEL is unset. The offline provider does not call it.
+  model: "openai/gpt-4o-mini"
+  provider_env: AGENT_PROVIDER
+  sql_row_limit: 200
+  sql_timeout_ms: 5000
+  sql_max_bytes: 50000
+  openrouter_timeout_s: 60
+  langfuse_timeout_s: 5
+  trace_path: traces/ask.jsonl
 
 librechat_v1:
   status: planned_not_deployed
@@ -41,7 +53,8 @@ provider_account:
   key_spend_cap: not_configured
 
 traces:
-  headless_workflow: not_instrumented
+  # Local JSONL always. Langfuse OTLP only when the three LANGFUSE_* variables are set.
+  headless_workflow: local_jsonl_and_optional_langfuse
   librechat_langfuse: not_connected
   librechat_backend_otel: not_connected
   librechat_browser_rum: not_connected

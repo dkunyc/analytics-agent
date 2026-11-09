@@ -1,0 +1,65 @@
+{
+  "dataset": "synthetic",
+  "provider": "offline",
+  "calls_network": false,
+  "note": "The scripted provider uses question and sql. The check compares tool rows with expected_rows. The provider does not read expected_rows.",
+  "cases": [
+    {
+      "id": "open_pipeline_by_source",
+      "question": "What is open pipeline by source system?",
+      "sql": "select source_system, round(sum(amount), 2) as open_amount from pipeline_items where is_open group by source_system order by source_system",
+      "expected_rows": [
+        ["hubspot", 18000],
+        ["salesforce", 62000]
+      ]
+    },
+    {
+      "id": "open_pipeline_amount",
+      "question": "What is the open sales pipeline amount across Salesforce opportunities and HubSpot deals?",
+      "sql": "select round(sum(amount), 2) as open_amount from pipeline_items where is_open",
+      "expected_rows": [[80000]]
+    },
+    {
+      "id": "salesforce_open_pipeline",
+      "question": "What is the open Salesforce opportunity amount?",
+      "sql": "select round(sum(amount), 2) as open_amount from pipeline_items where is_open and source_system = 'salesforce'",
+      "expected_rows": [[62000]]
+    },
+    {
+      "id": "hubspot_open_pipeline",
+      "question": "What is the open HubSpot deal amount?",
+      "sql": "select round(sum(amount), 2) as open_amount from pipeline_items where is_open and source_system = 'hubspot'",
+      "expected_rows": [[18000]]
+    },
+    {
+      "id": "signups_without_contact",
+      "question": "How many sample signup events have no HubSpot contact id?",
+      "sql": "select count(*) as signups_without_contact from crm_raw.signup_event where hubspot_contact_source_id is null",
+      "expected_rows": [[1]]
+    },
+    {
+      "id": "total_successful_revenue",
+      "question": "What is the total successful payment revenue?",
+      "sql": "select round(sum(successful_revenue), 2) as successful_revenue from customer_orders",
+      "expected_rows": [[78.5]]
+    },
+    {
+      "id": "completed_orders",
+      "question": "How many orders have status completed?",
+      "sql": "select count(*) as completed_orders from fct_orders where status = 'completed'",
+      "expected_rows": [[4]]
+    },
+    {
+      "id": "top_customer_by_revenue",
+      "question": "Which customer has the highest successful payment revenue? Tie-break is the lowest customer_id.",
+      "sql": "select first_name || ' ' || last_name as customer_name from customer_orders order by successful_revenue desc, customer_id asc limit 1",
+      "expected_rows": [["Avery Nguyen"]]
+    },
+    {
+      "id": "customers_without_orders",
+      "question": "How many customers have no orders?",
+      "sql": "select count(*) as customers_without_orders from customer_orders where order_count = 0",
+      "expected_rows": [[1]]
+    }
+  ]
+}

@@ -23,3 +23,5 @@ jobs:
         run: python scripts/smoke.py
       - name: Eval baseline
         run: python scripts/eval_check.py
+      - name: Ask offline
+        run: python scripts/ask_check.py
