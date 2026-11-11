@@ -27,6 +27,7 @@ from agent.offline import NO_SCRIPT, normalize, scripted_sql  # noqa: E402
 from agent.provider import ToolCall  # noqa: E402
 from agent.sql_tool import SqlRejected, SqlTool  # noqa: E402
 from agent.trace import build_otlp, langfuse_traces_url, new_record  # noqa: E402
+from agent.grounding import describe_warehouse  # noqa: E402
 from agent.workflow import ask  # noqa: E402
 
 TRACE_PATH = ROOT / "traces" / "ask-check.jsonl"
@@ -280,6 +281,60 @@ else:
     if not hostile.calls or "rejected" not in str(hostile.calls[0].get("error")):
         sys.exit(f"workflow did not record the rejected delete: {hostile.calls!r}")
     print(f"workflow rejected model delete: {hostile.calls[0]['error']}")
+
+    grounding_tool = SqlTool(settings.db_path, settings.row_limit, settings.timeout_ms, settings.max_bytes)
+    grounding_text, stored_values = describe_warehouse(grounding_tool)
+    expected_values = "main.pipeline_items.source_system: hubspot, salesforce"
+    if expected_values not in grounding_text:
+        sys.exit(f"grounding missing stored source_system values:\n{grounding_text}")
+    if stored_values.get("main.pipeline_items.source_system") != ["hubspot", "salesforce"]:
+        sys.exit(f"stored source_system values were {stored_values.get('main.pipeline_items.source_system')!r}")
+    print(f"grounding {expected_values}")
+
+    false_answer = (
+        "The open pipeline amounts for both Salesforce and HubSpot are null, "
+        "indicating that there are no open pipeline items for either source system."
+    )
+    bad_sql = (
+        "SELECT SUM(amount) AS open_pipeline_amount FROM main.pipeline_items "
+        "WHERE is_open = true AND source_system = 'Salesforce'",
+        "SELECT SUM(amount) AS open_pipeline_amount FROM main.pipeline_items "
+        "WHERE is_open = true AND source_system = 'HubSpot'",
+    )
+
+    class CaseMismatchProvider:
+        model = "case-mismatch-replay"
+
+        def complete(self, messages, tools):
+            del tools
+            from agent.provider import ModelTurn
+
+            if any(message.get("role") == "tool" for message in messages):
+                return ModelTurn(content=false_answer)
+            return ModelTurn(
+                tool_calls=[
+                    ToolCall(id="bad-1", name="query_warehouse", arguments={"sql": bad_sql[0]}),
+                    ToolCall(id="bad-2", name="query_warehouse", arguments={"sql": bad_sql[1]}),
+                ]
+            )
+
+    workflow_module.build_provider = lambda settings, offline=None: CaseMismatchProvider()
+    try:
+        mismatched = ask(
+            "What is open pipeline by source system?",
+            offline=True,
+            trace_path=TRACE_PATH,
+        )
+    finally:
+        workflow_module.build_provider = original
+    lowered = mismatched.answer.lower()
+    if false_answer.lower() in lowered or "there are no open pipeline items" in lowered:
+        sys.exit(f"workflow repeated the false empty-pipeline answer: {mismatched.answer!r}")
+    if "hubspot" not in lowered or "salesforce" not in lowered:
+        sys.exit(f"workflow answer omitted stored spellings: {mismatched.answer!r}")
+    if "not evidence" not in lowered:
+        sys.exit(f"workflow answer did not reject the null result: {mismatched.answer!r}")
+    print(f"case mismatch kept the false answer out: {mismatched.answer}")
 
     con = duckdb.connect(str(settings.db_path), read_only=True)
     try:

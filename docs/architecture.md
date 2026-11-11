@@ -11,7 +11,7 @@ Ingestion, transformation, checks, and the question command are separate modules
 - `ingestion/` loads synthetic CRM rows with dlt into DuckDB. It does not call a model or a chat UI.
 - `warehouse/` is the dbt project. It reads the dlt schema and builds `pipeline_items`.
 - `scripts/smoke.py` runs those steps in order. `scripts/eval_check.py` runs the offline SQL fixture. `scripts/ask_check.py` runs the ask workflow with the scripted provider.
-- `python -m agent.ask` answers one question. `agent.workflow.ask` is the same function a later UI can call. The model, or the offline script, may call `query_warehouse`. That tool opens a read-only DuckDB connection, allows one `SELECT` or `WITH`, and enforces a row cap, a byte cap, and a wall-clock interrupt. Writes, DDL, extra statements, and file readers are rejected in that module before execution.
+- `python -m agent.ask` answers one question. `agent.workflow.ask` is the same function a later UI can call. The model, or the offline script, may call `query_warehouse`. That tool opens a read-only DuckDB connection, allows one `SELECT` or `WITH`, and enforces a row cap, a byte cap, and a wall-clock interrupt. Writes, DDL, extra statements, and file readers are rejected in that module before execution. The prompt lists stored spellings for low-cardinality columns, read from the warehouse. A null or empty tool result is not reported as an empty pipeline.
 
 There is no chat or browser dependency in that path.
 

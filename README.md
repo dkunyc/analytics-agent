@@ -98,6 +98,15 @@ python -m agent.ask "What is open pipeline by source system?"
 
 `OPENROUTER_MODEL` is optional. When it is unset, the model is `headless_workflow.model` in `agent/config.yml` (`openai/gpt-4o-mini` in this checkout). The client posts to `https://openrouter.ai/api/v1/chat/completions`. `model=` in the output is that model name, and the trace includes token counts when OpenRouter returns them.
 
+The prompt includes stored spellings for low-cardinality columns, read from the warehouse. Filters are case-sensitive. A null sum is not reported as an empty pipeline. After pulling this branch, re-run the same question:
+
+```bash
+source .venv312/bin/activate
+export OPENROUTER_KEY="paste the key here"
+export OPENROUTER_MODEL="openai/gpt-4o-mini"
+python -m agent.ask "What is open pipeline by source system?"
+```
+
 This command does not read `OPENROUTER_API_KEY`. LibreChat documents that name as also rerouting its built-in OpenAI endpoint.
 
 ### Langfuse
